@@ -1,18 +1,19 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Models\User;
 
 class AuthController extends Controller
 {
-    public function register(Request $request) {
+    public function register(Request $request, user $user) {
         $fields = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed'
         ]);
+        
 
         $user = $user->create($fields);
 
@@ -36,13 +37,13 @@ class AuthController extends Controller
             return ['message' => 'The provided creadentials are incorrect.'];
         }
 
-        $user->createToken($user->name);
+        $token = $user->createToken($user->name);
         
         return [
             'user' => $user,
             'token' => $token->plainTextToken
         ];
-    }
+    }   
 
     public function logout(Request $request) {
         $request->user()->tokens()->delete();
